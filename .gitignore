@@ -1,0 +1,10 @@
+# Dependencies
+node_modules
+
+# IoT
+.pio
+.vscode
+.clang-format
+
+# Others
+.eslintrc.json
