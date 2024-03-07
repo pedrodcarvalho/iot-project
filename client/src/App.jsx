@@ -1,7 +1,22 @@
 import React, { useEffect } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import axios from 'axios';
 
+import SignUp from './pages/Signup/Signup';
+import SignIn from './pages/Signin/Signin';
+
 import './App.css';
+
+const router = createBrowserRouter([
+  {
+    path: '/signup',
+    element: <SignUp />,
+  },
+  {
+    path: 'signin',
+    element: <SignIn />,
+  }
+]);
 
 const App = () => {
   useEffect(() => {
@@ -27,10 +42,7 @@ const App = () => {
   useEffect(() => {
     const fetchServerEndpoint = async () => {
       try {
-        await axios.get('http://localhost:3001/')
-          .then((res) => {
-            console.log(res.data);
-          });
+        await axios.get('http://localhost:5000/');
       }
       catch (err) {
         console.error(err);
@@ -42,7 +54,7 @@ const App = () => {
 
   return (
     <>
-      <h1>Hello World!</h1>
+      <RouterProvider router={router} />
     </>
   );
 };
