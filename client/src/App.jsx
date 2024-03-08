@@ -1,20 +1,33 @@
 import React, { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import axios from 'axios';
 
 import SignUp from './pages/Signup/Signup';
 import SignIn from './pages/Signin/Signin';
+import Home from './pages/Home/Home';
+import ErrorPage from './pages/ErrorPage/ErrorPage';
 
 import './App.css';
 
 const router = createBrowserRouter([
   {
     path: '/signup',
-    element: <SignUp />,
+    element: <SignUp />
   },
   {
     path: 'signin',
-    element: <SignIn />,
+    element: <SignIn />
+  },
+  {
+    path: '/home',
+    element: <Home />
+  },
+  {
+    path: '/error',
+    element: <ErrorPage />
+  },
+  {
+    path: '*',
+    element: <ErrorPage />
   }
 ]);
 
@@ -37,19 +50,6 @@ const App = () => {
     return () => {
       ws.close();
     };
-  }, []);
-
-  useEffect(() => {
-    const fetchServerEndpoint = async () => {
-      try {
-        await axios.get('http://localhost:5000/');
-      }
-      catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchServerEndpoint();
   }, []);
 
   return (

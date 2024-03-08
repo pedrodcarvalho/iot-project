@@ -13,6 +13,7 @@ import Box from '@mui/material/Box';
 import Person from '@mui/icons-material/Person';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Alert from '@mui/material/Alert';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { InputAdornment, IconButton } from '@mui/material';
@@ -34,6 +35,8 @@ const defaultTheme = createTheme();
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const handleToggleVisibility = () => {
     setShowPassword(!showPassword);
@@ -42,23 +45,23 @@ const SignIn = () => {
   const [formValues, setFormValues] = React.useState({
     username: '',
     password: '',
+    remember: false,
   });
 
   const handleInputChange = (event) => {
     setFormValues({
       ...formValues,
-      [event.target.name]: event.target.value,
+      [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value,
     });
   };
 
   const validateForm = () => {
     const errors = {};
 
-    if (!formValues.username && formValues.username.length != 0) {
+    if (!formValues.username) {
       errors.username = 'Invalid username';
     }
-
-    if (formValues.password.length < 8 && formValues.password.length != 0) {
+    if (formValues.password.length < 8) {
       errors.password = 'Password must be at least 8 characters long';
     }
 
@@ -66,19 +69,21 @@ const SignIn = () => {
   };
 
   const handleSubmit = (event) => {
+    setFormSubmitted(true);
+
     event.preventDefault();
 
     const errors = validateForm();
 
     if (Object.keys(errors).length === 0) {
       axios.post('http://localhost:5000/auth/login', formValues)
-        .then(() => {
+        .then((res) => {
+          localStorage.setItem('token', res.data.token);
           window.location.href = '/home';
+        })
+        .catch(() => {
+          setFormError('Invalid username or password');
         });
-    }
-    else {
-      // TODO - handle form validation errors
-      console.log('Form validation failed:', errors);
     }
   };
 
@@ -111,8 +116,8 @@ const SignIn = () => {
               name='username'
               autoComplete='username'
               autoFocus
-              error={!!validateForm().username}
-              helperText={validateForm().username}
+              error={formSubmitted && !!validateForm().username}
+              helperText={formSubmitted && validateForm().username}
             />
             <TextField
               onChange={handleInputChange}
@@ -124,8 +129,8 @@ const SignIn = () => {
               type={showPassword ? 'text' : 'password'}
               id='password'
               autoComplete='current-password'
-              error={!!validateForm().password}
-              helperText={validateForm().password}
+              error={formSubmitted && !!validateForm().password}
+              helperText={formSubmitted && validateForm().password}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position='end'>
@@ -137,9 +142,15 @@ const SignIn = () => {
               }}
             />
             <FormControlLabel
-              control={<Checkbox value='remember' color='primary' />}
+              onChange={handleInputChange}
+              control={<Checkbox name='remember' color='primary' />}
               label='Remember me'
             />
+            {formError && (
+              <Alert severity='error' sx={{ mt: 2 }}>
+                {formError}
+              </Alert>
+            )}
             <Button
               type='submit'
               fullWidth

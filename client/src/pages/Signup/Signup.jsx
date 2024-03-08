@@ -13,6 +13,7 @@ import Box from '@mui/material/Box';
 import Person from '@mui/icons-material/Person';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Alert from '@mui/material/Alert';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { InputAdornment, IconButton } from '@mui/material';
@@ -22,7 +23,7 @@ const Copyright = (props) => {
     <Typography variant='body2' color='text.secondary' align='center' {...props}>
       {'Copyright © '}
       <Link color='inherit' href='/'>
-        Your Website
+        IoT Project
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -34,6 +35,8 @@ const defaultTheme = createTheme();
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const handleToggleVisibility = () => {
     setShowPassword(!showPassword);
@@ -56,16 +59,16 @@ const SignUp = () => {
   const validateForm = () => {
     const errors = {};
 
-    if (!formValues.firstName && formValues.firstName.length != 0) {
+    if (!formValues.firstName) {
       errors.firstName = 'First name is required';
     }
-    if (!formValues.lastName && formValues.lastName.length != 0) {
+    if (!formValues.lastName) {
       errors.lastName = 'Last name is required';
     }
-    if ((!formValues.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) && formValues.email.length != 0) {
+    if (!formValues.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) {
       errors.email = 'Invalid email address';
     }
-    if (formValues.password.length < 8 && formValues.password.length != 0) {
+    if (formValues.password.length < 8) {
       errors.password = 'Password must be at least 8 characters long';
     }
 
@@ -73,16 +76,17 @@ const SignUp = () => {
   };
 
   const handleSubmit = (event) => {
+    setFormSubmitted(true);
+
     event.preventDefault();
 
     const errors = validateForm();
 
     if (Object.keys(errors).length === 0) {
-      axios.post('http://localhost:5000/auth/register', formValues);
-    }
-    else {
-      // TODO - handle form validation errors
-      console.error('Form validation failed:', errors);
+      axios.post('http://localhost:5000/auth/register', formValues)
+        .catch((err) => {
+          setFormError(err.response.data.message);
+        });
     }
   };
 
@@ -116,8 +120,8 @@ const SignUp = () => {
                   id='firstName'
                   label='First Name'
                   autoFocus
-                  error={!!validateForm().firstName}
-                  helperText={validateForm().firstName}
+                  error={formSubmitted && !!validateForm().firstName}
+                  helperText={formSubmitted && validateForm().firstName}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -129,8 +133,8 @@ const SignUp = () => {
                   label='Last Name'
                   name='lastName'
                   autoComplete='family-name'
-                  error={!!validateForm().lastName}
-                  helperText={validateForm().lastName}
+                  error={formSubmitted && !!validateForm().lastName}
+                  helperText={formSubmitted && validateForm().lastName}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -142,8 +146,8 @@ const SignUp = () => {
                   label='Email Address'
                   name='email'
                   autoComplete='email'
-                  error={!!validateForm().email}
-                  helperText={validateForm().email}
+                  error={formSubmitted && !!validateForm().email}
+                  helperText={formSubmitted && validateForm().email}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -156,8 +160,8 @@ const SignUp = () => {
                   type={showPassword ? 'text' : 'password'}
                   id='password'
                   autoComplete='new-password'
-                  error={!!validateForm().password}
-                  helperText={validateForm().password}
+                  error={formSubmitted && !!validateForm().password}
+                  helperText={formSubmitted && validateForm().password}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position='end'>
@@ -176,6 +180,11 @@ const SignUp = () => {
                 />
               </Grid>
             </Grid>
+            {formError && (
+              <Alert severity='error' sx={{ mt: 2 }}>
+                {formError}
+              </Alert>
+            )}
             <Button
               type='submit'
               fullWidth
