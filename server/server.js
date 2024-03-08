@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const WebSocket = require('ws');
@@ -49,7 +50,7 @@ wss.on('connection', (ws) => {
     console.log('Client connected');
 
     ws.on('message', (message) => {
-        wss.clients.map((client) => {
+        wss.clients.forEach((client) => {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(message);
             }

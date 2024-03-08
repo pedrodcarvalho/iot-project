@@ -1,6 +1,6 @@
 const getHome = async (req, res) => {
     try {
-        res.status(200).json({ message: 'Hello from home page!' });
+        res.status(200).json({ user: req.user });
     }
     catch (err) {
         res.status(500).json({ err: err.message });
