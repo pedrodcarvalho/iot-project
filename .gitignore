@@ -7,4 +7,12 @@ node_modules
 .clang-format
 
 # Others
-.eslintrc.json
+.eslintrc
+.prettierrc
+jsconfig.json
+yarn.lock
+.env
+
+# Build
+build
+dist
