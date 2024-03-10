@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const verifyJWT = require('../middleware/jwt');
-const homeController = require('../controllers/homeController');
+const userController = require('../controllers/userController');
 
-router.get('/home', verifyJWT, homeController.getHome);
+router.get('/user', verifyJWT, userController.getUser);
 
 module.exports = router;
