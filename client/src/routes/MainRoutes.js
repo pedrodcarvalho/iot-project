@@ -4,7 +4,7 @@ import Loadable from 'components/Loadable';
 import MainLayout from 'layout/MainLayout';
 
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
-const SamplePage = Loadable(lazy(() => import('pages/extra-pages/SamplePage')));
+const AddStudent = Loadable(lazy(() => import('pages/extra-pages/AddStudent')));
 const ErrorPage = Loadable(lazy(() => import('pages/error-page/ErrorPage')));
 
 const Typography = Loadable(lazy(() => import('pages/components-overview/Typography')));
@@ -34,8 +34,8 @@ const MainRoutes = {
       ]
     },
     {
-      path: 'sample-page',
-      element: <SamplePage />
+      path: 'add-student',
+      element: <AddStudent />
     },
     {
       path: 'shadow',

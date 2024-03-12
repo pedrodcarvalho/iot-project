@@ -6,11 +6,8 @@ import AuthCard from './AuthCard';
 import Logo from 'components/Logo';
 import AuthFooter from 'components/cards/AuthFooter';
 
-import AuthBackground from 'assets/images/auth/AuthBackground';
-
 const AuthWrapper = ({ children }) => (
   <Box sx={{ minHeight: '100vh' }}>
-    <AuthBackground />
     <Grid
       container
       direction="column"

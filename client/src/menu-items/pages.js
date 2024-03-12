@@ -1,29 +1,29 @@
-import { LoginOutlined, ProfileOutlined } from '@ant-design/icons';
+import { UserAddOutlined, GithubOutlined } from '@ant-design/icons';
 
 const icons = {
-  LoginOutlined,
-  ProfileOutlined
+  UserAddOutlined,
+  GithubOutlined
 };
 
 const pages = {
-  id: 'authentication',
-  title: 'Authentication',
+  id: 'pages',
+  title: 'Pages',
   type: 'group',
   children: [
     {
-      id: 'login1',
-      title: 'Login',
+      id: 'add-student',
+      title: 'Add Student',
       type: 'item',
-      url: '/login',
-      icon: icons.LoginOutlined,
-      target: true
+      url: '/add-student',
+      icon: icons.UserAddOutlined
     },
     {
-      id: 'register1',
-      title: 'Register',
+      id: 'documentation',
+      title: 'Documentation',
       type: 'item',
-      url: '/register',
-      icon: icons.ProfileOutlined,
+      url: 'https://github.com/pedrodcarvalho/iot-project/blob/main/README.md',
+      icon: icons.GithubOutlined,
+      external: true,
       target: true
     }
   ]

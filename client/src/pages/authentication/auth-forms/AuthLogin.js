@@ -5,7 +5,6 @@ import axios from 'axios';
 import {
   Button,
   Checkbox,
-  Divider,
   FormControlLabel,
   FormHelperText,
   Grid,
@@ -21,7 +20,6 @@ import {
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 
-import FirebaseSocial from './FirebaseSocial';
 import AnimateButton from 'components/@extended/AnimateButton';
 
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
@@ -53,8 +51,6 @@ const AuthLogin = () => {
     <>
       <Formik
         initialValues={{
-          username: 'info@codedthemes.com',
-          password: '123456',
           submit: null
         }}
         validationSchema={Yup.object().shape({
@@ -167,14 +163,6 @@ const AuthLogin = () => {
                     Login
                   </Button>
                 </AnimateButton>
-              </Grid>
-              <Grid item xs={12}>
-                <Divider>
-                  <Typography variant="caption"> Login with</Typography>
-                </Divider>
-              </Grid>
-              <Grid item xs={12}>
-                <FirebaseSocial />
               </Grid>
             </Grid>
           </form>
