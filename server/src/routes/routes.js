@@ -7,5 +7,6 @@ const studentController = require('../controllers/studentController');
 
 router.get('/user', verifyJWT, userController.getUser);
 router.post('/add-student', verifyJWT, studentController.addStudent);
+router.post('/edit-student/:action', verifyJWT, studentController.editStudent);
 
 module.exports = router;
