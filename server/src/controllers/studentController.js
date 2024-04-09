@@ -1,5 +1,15 @@
 const User = require('../models/user');
 
+const getStudents = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.user.data.username });
+        res.status(200).json(user.students);
+    }
+    catch (err) {
+        res.status(500).json({ err: err.message });
+    }
+};
+
 const addStudent = async (req, res) => {
     try {
         const user = await User.findOne({ username: req.user.data.username });
@@ -58,6 +68,7 @@ const editStudent = async (req, res) => {
 };
 
 module.exports = {
+    getStudents,
     addStudent,
     editStudent
 };

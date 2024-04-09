@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import axios from 'axios';
 
 import { Box, Link, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
@@ -8,22 +9,36 @@ import { NumericFormat } from 'react-number-format';
 
 import Dot from 'components/@extended/Dot';
 
-function createData(trackingNo, name, fat, carbs, protein) {
-  return { trackingNo, name, fat, carbs, protein };
+function createData(studentNumber, name, course, cardId) {
+  return { studentNumber, name, course, cardId };
 }
 
-const rows = [
-  createData(84564564, 'Camera Lens', 40, 2, 40570),
-  createData(98764564, 'Laptop', 300, 0, 180139),
-  createData(98756325, 'Mobile', 355, 1, 90989),
-  createData(98652366, 'Handset', 50, 1, 10239),
-  createData(13286564, 'Computer Accessories', 100, 1, 83348),
-  createData(86739658, 'TV', 99, 0, 410780),
-  createData(13256498, 'Keyboard', 125, 2, 70999),
-  createData(98753263, 'Mouse', 89, 2, 10570),
-  createData(98753275, 'Desktop', 185, 1, 98063),
-  createData(98753291, 'Chair', 100, 0, 14001)
-];
+const rows = [];
+
+const getStudents = async () => {
+  const token = localStorage.getItem('token');
+
+  return await axios.get('http://localhost:5000/students', {
+    headers: {
+      'Authorization': token
+    }
+  })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      return err;
+    });
+};
+const setStudents = async () => {
+  const students = Array.from(await getStudents());
+
+  students.forEach((student) => {
+    rows.push(createData(student.studentNumber, student.name, student.course, student.cardId));
+  });
+};
+
+setStudents();
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -53,35 +68,28 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: 'trackingNo',
+    id: 'studentNumber',
     align: 'left',
     disablePadding: false,
-    label: 'Tracking No.'
+    label: 'Student Number'
   },
   {
     id: 'name',
     align: 'left',
     disablePadding: true,
-    label: 'Product Name'
+    label: 'Name'
   },
   {
-    id: 'fat',
-    align: 'right',
-    disablePadding: false,
-    label: 'Total Order'
-  },
-  {
-    id: 'carbs',
+    id: 'course',
     align: 'left',
     disablePadding: false,
-
-    label: 'Status'
+    label: 'Course'
   },
   {
-    id: 'protein',
+    id: 'cardId',
     align: 'right',
     disablePadding: false,
-    label: 'Total Amount'
+    label: 'Card ID'
   }
 ];
 
@@ -109,27 +117,18 @@ OrderTableHead.propTypes = {
   orderBy: PropTypes.string
 };
 
-const OrderStatus = ({ status }) => {
+const Course = ({ course }) => {
   let color;
   let title;
 
-  switch (status) {
-    case 0:
-      color = 'warning';
-      title = 'Pending';
-      break;
-    case 1:
-      color = 'success';
-      title = 'Approved';
-      break;
-    case 2:
-      color = 'error';
-      title = 'Rejected';
-      break;
-    default:
-      color = 'primary';
-      title = 'None';
+  if (course.includes('Computer Engineering')) {
+    color = 'primary';
   }
+  else {
+    color = 'secondary';
+  }
+
+  title = course;
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
@@ -139,16 +138,16 @@ const OrderStatus = ({ status }) => {
   );
 };
 
-OrderStatus.propTypes = {
-  status: PropTypes.number
+Course.propTypes = {
+  course: PropTypes.string
 };
 
 export default function OrderTable() {
   const [order] = useState('asc');
-  const [orderBy] = useState('trackingNo');
+  const [orderBy] = useState('studentNumber');
   const [selected] = useState([]);
 
-  const isSelected = (trackingNo) => selected.indexOf(trackingNo) !== -1;
+  const isSelected = (studentNumber) => selected.indexOf(studentNumber) !== -1;
 
   return (
     <Box>
@@ -176,7 +175,7 @@ export default function OrderTable() {
           <OrderTableHead order={order} orderBy={orderBy} />
           <TableBody>
             {stableSort(rows, getComparator(order, orderBy)).map((row, index) => {
-              const isItemSelected = isSelected(row.trackingNo);
+              const isItemSelected = isSelected(row.studentNumber);
               const labelId = `enhanced-table-checkbox-${index}`;
 
               return (
@@ -186,21 +185,20 @@ export default function OrderTable() {
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   aria-checked={isItemSelected}
                   tabIndex={-1}
-                  key={row.trackingNo}
+                  key={row.studentNumber}
                   selected={isItemSelected}
                 >
                   <TableCell component="th" id={labelId} scope="row" align="left">
                     <Link color="secondary" component={RouterLink} to="">
-                      {row.trackingNo}
+                      {row.studentNumber}
                     </Link>
                   </TableCell>
                   <TableCell align="left">{row.name}</TableCell>
-                  <TableCell align="right">{row.fat}</TableCell>
                   <TableCell align="left">
-                    <OrderStatus status={row.carbs} />
+                    <Course course={row.course} />
                   </TableCell>
                   <TableCell align="right">
-                    <NumericFormat value={row.protein} displayType="text" thousandSeparator prefix="$" />
+                    <NumericFormat value={row.cardId} displayType="text" />
                   </TableCell>
                 </TableRow>
               );
