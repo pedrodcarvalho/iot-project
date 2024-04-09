@@ -2,16 +2,22 @@
 #include <WiFi.h>
 #include <cstdlib>
 #include <WebSocketsClient.h>
+#include <SPI.h>
+#include <MFRC522.h>
 
-const char *ssid = std::getenv("SSID");
-const char *password = std::getenv("PASSWORD");
-const char *ipAddress = std::getenv("IP_ADDRESS");
+#define SS_PIN 5
+#define RST_PIN 0
+
+MFRC522 rfid(SS_PIN, RST_PIN);
+
+MFRC522::MIFARE_Key key;
+
+const char *ssid = "Prime";
+const char *password = "Carnaval21&";
+const char *ipAddress = "192.168.15.143";
 const uint16_t wsPort = 8080;
 
 WebSocketsClient webSocket;
-
-unsigned long lastTransmissionTime = 0;
-const unsigned long TRANSMIT_DELAY = 10000;
 
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 {
@@ -35,6 +41,9 @@ void setup()
 {
     Serial.begin(115200);
 
+    SPI.begin();
+    rfid.PCD_Init();
+
     WiFi.begin(ssid, password);
 
     while (WiFi.status() != WL_CONNECTED) {
@@ -49,11 +58,20 @@ void loop()
 {
     webSocket.loop();
 
-    unsigned long currentTransmissionTime = millis();
+    if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
+        return;
+    }
+    else {
+        MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
 
-    if (currentTransmissionTime - lastTransmissionTime >= TRANSMIT_DELAY) {
-        webSocket.sendTXT("Hello, world!");
+        if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI && piccType != MFRC522::PICC_TYPE_MIFARE_1K && piccType != MFRC522::PICC_TYPE_MIFARE_4K) {
+            Serial.println(F("Invalid card or tag type!"));
+            return;
+        }
 
-        lastTransmissionTime = currentTransmissionTime;
+        webSocket.sendBIN(rfid.uid.uidByte, rfid.uid.size);
+
+        rfid.PICC_HaltA();
+        rfid.PCD_StopCrypto1();
     }
 }
