@@ -14,7 +14,7 @@ const addStudent = async (req, res) => {
     try {
         const user = await User.findOne({ username: req.user.data.username });
 
-        const { name, studentNumber, course } = req.body;
+        const { name, studentNumber, course, cardId } = req.body;
         const newStudent = {
             name,
             studentNumber,
@@ -35,13 +35,13 @@ const addStudent = async (req, res) => {
 const editStudent = async (req, res) => {
     try {
         const user = await User.findOne({ username: req.user.data.username });
-        const student = user.students.filter(student => student.studentNumber === req.body.studentNumber)[0];
+        const student = user.students.filter(student => student.cardId === req.body.cardId)[0];
 
         if (!student) {
             throw new Error('Student not found');
         }
 
-        const { name, studentNumber, course, cardId } = req.body;
+        const { name, studentNumber, course } = req.body;
         const action = req.params.action;
 
         switch (action) {
@@ -49,10 +49,9 @@ const editStudent = async (req, res) => {
                 student.name = name;
                 student.studentNumber = studentNumber;
                 student.course = course;
-                student.cardId = cardId;
                 break;
             case 'delete':
-                student.remove();
+                user.students.splice(user.students.indexOf(student), 1);
                 break;
             default:
                 throw new Error('Invalid action');
@@ -67,8 +66,25 @@ const editStudent = async (req, res) => {
     }
 };
 
+const findStudent = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.user.data.username });
+        const student = user.students.filter(student => student.cardId === req.params.cardId)[0];
+
+        if (!student) {
+            throw new Error('Student not found');
+        }
+
+        res.status(200).json(student);
+    }
+    catch (err) {
+        res.status(500).json({ err: err.message });
+    }
+};
+
 module.exports = {
     getStudents,
     addStudent,
-    editStudent
+    editStudent,
+    findStudent
 };

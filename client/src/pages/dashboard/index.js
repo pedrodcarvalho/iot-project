@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import { nanoid } from 'nanoid';
 
 import {
   Box,
@@ -26,10 +27,11 @@ const DashboardDefault = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const [userData, setUserData] = useState(user);
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
 
   const fetchUser = () => {
     try {
-      const token = localStorage.getItem('token');
+      setToken(localStorage.getItem('token'));
 
       axios.get('http://localhost:5000/user', {
         headers: {
@@ -60,8 +62,38 @@ const DashboardDefault = () => {
       console.log('Connected to WebSocket server');
     };
 
-    ws.onmessage = (message) => {
+    ws.onmessage = async (message) => {
       console.log('Received message:', message.data);
+      try {
+        await axios.get(`http://localhost:5000/find-student/${message.data}`, {
+          headers: {
+            Authorization: token
+          }
+        }).then((res) => {
+          console.log(res.data);
+        });
+      }
+      catch (err) {
+        const values = {
+          cardId: message.data,
+          course: 'Computer Engineering 4',
+          name: `Student ${nanoid(3)}`,
+          studentNumber: '12345678',
+          submit: null
+        };
+
+        await axios.post('http://localhost:5000/add-student', values, {
+          headers: {
+            'Authorization': token
+          }
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            return err;
+          });
+      }
     };
 
     ws.onclose = () => {

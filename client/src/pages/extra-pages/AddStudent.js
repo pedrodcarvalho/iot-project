@@ -43,8 +43,8 @@ const AddStudent = () => {
           }}
           validationSchema={Yup.object().shape({
             name: Yup.string().max(255).required('Name is required'),
-            studentNumber: Yup.string().max(255).matches(/^[0-9]+$/, 'Student number must be a number').
-              min(8, 'Student number must be at least 8 characters').required('Student number is required'),
+            studentNumber: Yup.string().max(255).matches(/^[0-9]+$/, 'Student number must be a number')
+              .min(8, 'Student number must be at least 8 characters').required('Student number is required'),
             course: Yup.string().max(255).matches(/^[a-zA-Z\s]+[0-9]+$/, 'Course must include the name followed by a space and the year level')
               .required('Course is required'),
             cardId: Yup.string().max(255).required('Card ID is required')

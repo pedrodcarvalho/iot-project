@@ -197,9 +197,7 @@ export default function OrderTable() {
                   <TableCell align="left">
                     <Course course={row.course} />
                   </TableCell>
-                  <TableCell align="right">
-                    <NumericFormat value={row.cardId} displayType="text" />
-                  </TableCell>
+                  <TableCell align="right">{row.cardId}</TableCell>
                 </TableRow>
               );
             })}

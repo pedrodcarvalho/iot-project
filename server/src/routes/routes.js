@@ -9,5 +9,6 @@ router.get('/user', verifyJWT, userController.getUser);
 router.get('/students', verifyJWT, studentController.getStudents);
 router.post('/add-student', verifyJWT, studentController.addStudent);
 router.post('/edit-student/:action', verifyJWT, studentController.editStudent);
+router.get('/find-student/:cardId', verifyJWT, studentController.findStudent);
 
 module.exports = router;

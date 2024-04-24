@@ -1,8 +1,9 @@
-import { UserAddOutlined, EditOutlined, GithubOutlined } from '@ant-design/icons';
+import { UserAddOutlined, EditOutlined, CheckSquareOutlined, GithubOutlined } from '@ant-design/icons';
 
 const icons = {
   UserAddOutlined,
   EditOutlined,
+  CheckSquareOutlined,
   GithubOutlined
 };
 
@@ -24,6 +25,13 @@ const pages = {
       type: 'item',
       url: '/edit-student',
       icon: icons.EditOutlined
+    },
+    {
+      id: 'attendance-check',
+      title: 'Attendance Check',
+      type: 'item',
+      url: '/attendance-check',
+      icon: icons.CheckSquareOutlined
     },
     {
       id: 'documentation',
