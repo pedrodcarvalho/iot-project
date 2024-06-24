@@ -36,7 +36,7 @@ const AddStudent = () => {
 
   return (
     <>
-      <MainCard title="Add new student" content="Enter student informations to add">
+      <MainCard title="Add new student">
         <Formik
           initialValues={{
             submit: null

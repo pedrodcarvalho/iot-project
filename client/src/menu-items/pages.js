@@ -1,8 +1,9 @@
-import { UserAddOutlined, EditOutlined, CheckSquareOutlined, GithubOutlined } from '@ant-design/icons';
+import { UserAddOutlined, EditOutlined, AppstoreAddOutlined, CheckSquareOutlined, GithubOutlined } from '@ant-design/icons';
 
 const icons = {
   UserAddOutlined,
   EditOutlined,
+  AppstoreAddOutlined,
   CheckSquareOutlined,
   GithubOutlined
 };
@@ -25,6 +26,13 @@ const pages = {
       type: 'item',
       url: '/edit-student',
       icon: icons.EditOutlined
+    },
+    {
+      id: 'add-class',
+      title: 'Add Class',
+      type: 'item',
+      url: '/add-Class',
+      icon: icons.AppstoreAddOutlined
     },
     {
       id: 'attendance-check',

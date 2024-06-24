@@ -6,6 +6,7 @@ import MainLayout from 'layout/MainLayout';
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
 const AddStudent = Loadable(lazy(() => import('pages/extra-pages/AddStudent')));
 const EditStudent = Loadable(lazy(() => import('pages/extra-pages/EditStudent')));
+const AddClass = Loadable(lazy(() => import('pages/extra-pages/AddClass')));
 const AttendanceCheck = Loadable(lazy(() => import('pages/extra-pages/AttendanceCheck')));
 const ErrorPage = Loadable(lazy(() => import('pages/error-page/ErrorPage')));
 
@@ -42,6 +43,10 @@ const MainRoutes = {
     {
       path: 'edit-student',
       element: <EditStudent />
+    },
+    {
+      path: 'add-class',
+      element: <AddClass />
     },
     {
       path: 'attendance-check',

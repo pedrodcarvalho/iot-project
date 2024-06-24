@@ -1,14 +1,20 @@
 import React from 'react';
 import axios from 'axios';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   Button,
   FormHelperText,
   Grid,
   InputLabel,
-  OutlinedInput,
+  Select,
   Stack,
+  MenuItem,
+  List,
 } from '@mui/material';
+
+import { DeleteOutlined } from '@ant-design/icons';
 
 import MainCard from 'components/MainCard';
 
@@ -17,11 +23,101 @@ import { Formik } from 'formik';
 
 import AnimateButton from 'components/@extended/AnimateButton';
 
+import { setUser } from 'store/reducers/user';
+
 const AttendanceCheck = () => {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
+  const [userData, setUserData] = useState(user);
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
+  let [classes, setClasses] = useState([]);
+  let [presentStudents, setPresentStudents] = useState([]);
+
+  const fetchUser = () => {
+    try {
+      setToken(localStorage.getItem('token'));
+
+      axios.get('http://localhost:5000/user', {
+        headers: {
+          Authorization: token
+        }
+      })
+        .then((res) => {
+          setUserData(userData);
+          dispatch(setUser(res.data));
+          console.log(res.data);
+        });
+    }
+    catch (err) {
+      window.location.href = `/error?message=${err.message}`;
+    }
+  };
+
+  const fetchClasses = async () => {
+    try {
+      await axios.get(`http://localhost:5000/get-classes`, {
+        headers: {
+          Authorization: token
+        }
+      }).then((res) => {
+        setClasses(res.data);
+        console.log(res.data);
+      });
+    }
+    catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+    fetchClasses();
+  }, []);
+
+  /*  */
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://127.0.0.1:8080');
+
+    ws.onopen = () => {
+      console.log('Connected to WebSocket server');
+    };
+
+    ws.onmessage = async (message) => {
+      console.log('Received message:', message.data);
+      try {
+        await axios.get(`http://localhost:5000/find-student/${message.data}`, {
+          headers: {
+            Authorization: token
+          }
+        }).then((res) => {
+          if (!presentStudents.includes(res.data.name)) {
+            setPresentStudents([...presentStudents, res.data.name]);
+          }
+
+          console.log(res.data);
+        });
+      }
+      catch (err) {
+        console.log(err);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('Disconnected from WebSocket server');
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [token, presentStudents]);
+
   const handleSubmit = async (values) => {
     const token = localStorage.getItem('token');
 
-    return await axios.post('http://localhost:5000/add-student', values, {
+    values.students = presentStudents;
+
+    return await axios.post('http://localhost:5000/make-attendance', values, {
       headers: {
         'Authorization': token
       }
@@ -36,18 +132,14 @@ const AttendanceCheck = () => {
 
   return (
     <>
-      <MainCard title="Add new student" content="Enter student informations to add">
+      <MainCard title="Add new class">
         <Formik
           initialValues={{
-            submit: null
+            submit: null,
+            class: ''
           }}
           validationSchema={Yup.object().shape({
-            name: Yup.string().max(255).required('Name is required'),
-            studentNumber: Yup.string().max(255).matches(/^[0-9]+$/, 'Student number must be a number')
-              .min(8, 'Student number must be at least 8 characters').required('Student number is required'),
-            course: Yup.string().max(255).matches(/^[a-zA-Z\s]+[0-9]+$/, 'Course must include the name followed by a space and the year level')
-              .required('Course is required'),
-            cardId: Yup.string().max(255).required('Card ID is required')
+            class: Yup.string().max(255).required('Class name is required')
           })}
           onSubmit={async function (values, { setErrors, setStatus, setSubmitting }) {
             try {
@@ -71,89 +163,48 @@ const AttendanceCheck = () => {
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Stack spacing={1}>
-                    <InputLabel htmlFor="name-Add">Name</InputLabel>
-                    <OutlinedInput
-                      id="name-Add"
-                      type="name"
-                      value={values.name}
-                      name="name"
+                    <InputLabel htmlFor="class-Add">Class</InputLabel>
+                    <Select
+                      id="class-Add"
+                      type="class"
+                      value={values.class}
+                      name="class"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      placeholder="Enter student name"
+                      placeholder="Enter class name"
                       fullWidth
-                      error={Boolean(touched.name && errors.name)}
-                    />
-                    {touched.name && errors.name && (
-                      <FormHelperText error id="standard-weight-helper-text-name-Add">
-                        {errors.name}
+                      error={Boolean(touched.class && errors.class)}
+                    >
+                      {classes.map((_class) => (
+                        <MenuItem key={_class.name} value={_class.name}>{_class.name}</MenuItem>
+                      ))}
+                    </Select>
+                    {touched.class && errors.class && (
+                      <FormHelperText error id="standard-weight-helper-text-class-Add">
+                        {errors.class}
                       </FormHelperText>
                     )}
                   </Stack>
                 </Grid>
                 <Grid item xs={12}>
-                  <Stack spacing={1}>
-                    <InputLabel htmlFor="studentNumber-Add">Student number</InputLabel>
-                    <OutlinedInput
-                      fullWidth
-                      error={Boolean(touched.studentNumber && errors.studentNumber)}
-                      id="studentNumber-Add"
-                      type="text"
-                      value={values.studentNumber}
-                      name="studentNumber"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      placeholder="Enter student number"
-                    />
-                    {touched.studentNumber && errors.studentNumber && (
-                      <FormHelperText error id="standard-weight-helper-text-studentNumber-Add">
-                        {errors.studentNumber}
-                      </FormHelperText>
-                    )}
-                  </Stack>
+                  <List>
+                    {presentStudents.map((student) => (
+                      <MenuItem key={student} value={student}>
+                        <Grid item xs={12} style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          borderBottom: '1px solid #f0f0f0',
+                        }}
+                        >
+                          {student}
+                          <Button onClick={() => {
+                            setPresentStudents(presentStudents.filter((s) => s !== student));
+                          }}><DeleteOutlined /></Button>
+                        </Grid>
+                      </MenuItem>
+                    ))}
+                  </List>
                 </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={1}>
-                    <InputLabel htmlFor="course-Add">Course</InputLabel>
-                    <OutlinedInput
-                      fullWidth
-                      error={Boolean(touched.course && errors.course)}
-                      id="course-Add"
-                      type="text"
-                      value={values.course}
-                      name="course"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      placeholder="Enter student course (name and year level)"
-                    />
-                    {touched.course && errors.course && (
-                      <FormHelperText error id="standard-weight-helper-text-course-Add">
-                        {errors.course}
-                      </FormHelperText>
-                    )}
-                  </Stack>
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={1}>
-                    <InputLabel htmlFor="cardId-Add">Card ID</InputLabel>
-                    <OutlinedInput
-                      fullWidth
-                      error={Boolean(touched.cardId && errors.cardId)}
-                      id="cardId-Add"
-                      type="text"
-                      value={values.cardId}
-                      name="cardId"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      placeholder="Enter student card ID"
-                    />
-                    {touched.cardId && errors.cardId && (
-                      <FormHelperText error id="standard-weight-helper-text-cardId-Add">
-                        {errors.cardId}
-                      </FormHelperText>
-                    )}
-                  </Stack>
-                </Grid>
-
                 {errors.submit && (
                   <Grid item xs={12}>
                     <FormHelperText error>{errors.submit}</FormHelperText>
@@ -162,7 +213,7 @@ const AttendanceCheck = () => {
                 <Grid item xs={12}>
                   <AnimateButton>
                     <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                      Add
+                      Make Attendance
                     </Button>
                   </AnimateButton>
                 </Grid>

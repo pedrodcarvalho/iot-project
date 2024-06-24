@@ -6,6 +6,17 @@ const userSchema = new mongoose.Schema({
     lastName: String,
     email: String,
     password: String,
+    classes: [
+        {
+            name: String,
+            students: [
+                {
+                    name: String,
+                    time: Date
+                }
+            ]
+        }
+    ],
     students: [
         {
             name: String,

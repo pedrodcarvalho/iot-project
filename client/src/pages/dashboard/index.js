@@ -78,7 +78,7 @@ const DashboardDefault = () => {
           cardId: message.data,
           course: 'Computer Engineering 4',
           name: `Student ${nanoid(3)}`,
-          studentNumber: '12345678',
+          studentNumber: `${nanoid(8)}`,
           submit: null
         };
 
