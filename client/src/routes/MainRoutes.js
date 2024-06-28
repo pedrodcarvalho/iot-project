@@ -8,6 +8,7 @@ const AddStudent = Loadable(lazy(() => import('pages/extra-pages/AddStudent')));
 const EditStudent = Loadable(lazy(() => import('pages/extra-pages/EditStudent')));
 const AddClass = Loadable(lazy(() => import('pages/extra-pages/AddClass')));
 const AttendanceCheck = Loadable(lazy(() => import('pages/extra-pages/AttendanceCheck')));
+const StudentPresence = Loadable(lazy(() => import('pages/extra-pages/StudentPresence')));
 const ErrorPage = Loadable(lazy(() => import('pages/error-page/ErrorPage')));
 
 const Typography = Loadable(lazy(() => import('pages/components-overview/Typography')));
@@ -51,6 +52,10 @@ const MainRoutes = {
     {
       path: 'attendance-check',
       element: <AttendanceCheck />
+    },
+    {
+      path: 'student-presence',
+      element: <StudentPresence />
     },
     {
       path: 'shadow',

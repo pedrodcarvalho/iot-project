@@ -1,10 +1,11 @@
-import { UserAddOutlined, EditOutlined, AppstoreAddOutlined, CheckSquareOutlined, GithubOutlined } from '@ant-design/icons';
+import { UserAddOutlined, EditOutlined, AppstoreAddOutlined, CheckSquareOutlined, CheckCircleOutlined, GithubOutlined } from '@ant-design/icons';
 
 const icons = {
   UserAddOutlined,
   EditOutlined,
   AppstoreAddOutlined,
   CheckSquareOutlined,
+  CheckCircleOutlined,
   GithubOutlined
 };
 
@@ -31,7 +32,7 @@ const pages = {
       id: 'add-class',
       title: 'Add Class',
       type: 'item',
-      url: '/add-Class',
+      url: '/add-class',
       icon: icons.AppstoreAddOutlined
     },
     {
@@ -40,6 +41,13 @@ const pages = {
       type: 'item',
       url: '/attendance-check',
       icon: icons.CheckSquareOutlined
+    },
+    {
+      id: 'student-presence',
+      title: 'Student Presence',
+      type: 'item',
+      url: '/student-presence',
+      icon: icons.CheckCircleOutlined
     },
     {
       id: 'documentation',
