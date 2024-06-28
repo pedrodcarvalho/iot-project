@@ -14,10 +14,10 @@ const addStudent = async (req, res) => {
     try {
         const user = await User.findOne({ username: req.user.data.username });
 
-        const { name, studentNumber, course, cardId } = req.body;
+        const { name, studentName, course, cardId } = req.body;
         const newStudent = {
             name,
-            studentNumber,
+            studentName,
             course,
             cardId
         };
@@ -41,13 +41,13 @@ const editStudent = async (req, res) => {
             throw new Error('Student not found');
         }
 
-        const { name, studentNumber, course } = req.body;
+        const { name, studentName, course } = req.body;
         const action = req.params.action;
 
         switch (action) {
             case 'update':
                 student.name = name;
-                student.studentNumber = studentNumber;
+                student.studentName = studentName;
                 student.course = course;
                 break;
             case 'delete':
@@ -82,9 +82,37 @@ const findStudent = async (req, res) => {
     }
 };
 
+const getStudentPresence = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.user.data.username });
+        const student = user.students.filter(student => student.name === req.body.student)[0];
+
+        if (!student) {
+            throw new Error('Student not found');
+        }
+
+        const classes = req.user.data.classes;
+
+        const studentPresence = classes.map(cl => {
+            const attendance = cl.students.filter(st => st.name === student.name)[0];
+
+            return {
+                class: cl.name,
+                presence: attendance ? attendance : 'Not found'
+            };
+        });
+
+        res.status(200).json(studentPresence);
+    }
+    catch (err) {
+        res.status(500).json({ err: err.message });
+    }
+};
+
 module.exports = {
     getStudents,
     addStudent,
     editStudent,
-    findStudent
+    findStudent,
+    getStudentPresence
 };

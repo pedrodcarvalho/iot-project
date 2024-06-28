@@ -65,8 +65,19 @@ const makeAttendance = async (req, res) => {
     }
 };
 
+const getAttendance = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.user.data.username });
+        res.status(200).json(user.classes);
+    }
+    catch (err) {
+        res.status(500).json({ err: err.message });
+    }
+};
+
 module.exports = {
     getClasses,
     addClass,
-    makeAttendance
+    makeAttendance,
+    getAttendance
 };
